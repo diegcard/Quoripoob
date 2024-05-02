@@ -2,18 +2,15 @@ package Quoripoob.src.presentation;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
-public class QuoripoobGUI extends JFrame {
+public class QuoripoobGUI extends JFrame{
 
     // Constants Screen
     private static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    private static final int WIDTH = (int) (3 *screenSize.getWidth()/4);
-    private static final int HEIGHT = (int) (3 *screenSize.getHeight()/4);
+    private static final int WIDTH = (int) (3 * screenSize.getWidth() / 4);
+    private static final int HEIGHT = (int) (3 * screenSize.getHeight() / 4);
 
     // Panel Menu
     private JMenuItem itemNewGame;
@@ -23,6 +20,9 @@ public class QuoripoobGUI extends JFrame {
 
     // Panel Game
     private JPanel panelGame;
+
+    //buttons game
+    private JButton buttonPlay;
 
     /**
      * Method to prepare the menu
@@ -106,7 +106,7 @@ public class QuoripoobGUI extends JFrame {
             panelStart.add(new JLabel());
         }
         // Agregar el botón "Play"
-        JButton buttonPlay = new JButton("Play");
+        buttonPlay = new JButton("Play");
         buttonPlay.setFont(new Font("Arial", Font.BOLD, 25));
         buttonPlay.setForeground(Color.WHITE);
         buttonPlay.setBackground(new Color(51, 153, 255));
@@ -120,6 +120,13 @@ public class QuoripoobGUI extends JFrame {
             @Override
             public void mouseExited(MouseEvent e) {
                 buttonPlay.setBackground(new Color(51, 153, 255));
+            }
+
+            public void mouseClicked(MouseEvent e) {
+                //panelStart.setVisible(false);
+                //prepareGamePanel();3
+                GameConfig gameConfig = new GameConfig();
+                gameConfig.setVisible(true);
             }
         });
         panelStart.add(buttonPlay);
@@ -187,6 +194,46 @@ public class QuoripoobGUI extends JFrame {
         }
     }
 
+
+    private void prepareGamePanel() {
+        panelGame = new JPanel();
+        panelGame.setLayout(new GridLayout(8, 8));
+        panelGame.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        for (int i = 0; i < 64; i++) {
+            JButton button = new JButton();
+            button.setBackground(Color.WHITE);
+            button.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            panelGame.add(button);
+        }
+        //add botton to back
+        JButton buttonBack = new JButton("Back");
+        buttonBack.setFont(new Font("Arial", Font.BOLD, 25));
+        buttonBack.setForeground(Color.WHITE);
+        buttonBack.setBackground(new Color(51, 153, 255));
+        buttonBack.setBorder(BorderFactory.createRaisedBevelBorder());
+        buttonBack.setFocusPainted(false);
+        buttonBack.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                buttonBack.setBackground(new Color(102, 178, 255));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                buttonBack.setBackground(new Color(51, 153, 255));
+            }
+
+            public void mouseClicked(MouseEvent e) {
+                panelGame.setVisible(false);
+                prepareElemetsStart();
+            }
+        });
+        panelGame.add(buttonBack);
+
+        add(panelGame, BorderLayout.CENTER);
+    }
+
+
+
     /**
      * Main method
      * @param args Arguments
@@ -196,4 +243,5 @@ public class QuoripoobGUI extends JFrame {
         QuoripoobGUI gui = new QuoripoobGUI();
         gui.setVisible(true);
     }
+
 }
