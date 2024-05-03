@@ -1,5 +1,7 @@
 package Quoripoob.src.presentation;
 
+import Quoripoob.src.domain.Quoridor;
+
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -8,7 +10,6 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Set;
 
 public class GameConfig extends JFrame {
     // Constants Screen
@@ -17,6 +18,7 @@ public class GameConfig extends JFrame {
     private static final int HEIGHT = (int) (3 * screenSize.getHeight() / 5);
 
     private QuoripoobGUI quoripoobGUI;
+    private Quoridor quoridor;
 
     private JTextField gameSizeField;
 
@@ -32,6 +34,9 @@ public class GameConfig extends JFrame {
     private JComboBox<String> gamePlayers;
     private JComboBox<String> machine1;
     private JComboBox<String> machine2;
+    private JButton player1ColorButton;
+    private JButton player2ColorButton;
+    private JButton buttonStartGame;
 
 
     /**
@@ -113,10 +118,10 @@ public class GameConfig extends JFrame {
         panel.add(new JLabel("Player: "));
 
         player1Color = new Color(255, 0, 0);
-        JButton player1ColorButton = new JButton("Color");
+        player1ColorButton = new JButton("Color");
 
         player2Color = new Color(0, 0, 255);
-        JButton player2ColorButton = new JButton("Color");
+        player2ColorButton = new JButton("Color");
 
         panel.add(player1ColorButton);
         panel.add(player2ColorButton);
@@ -160,13 +165,13 @@ public class GameConfig extends JFrame {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(1,3));
         panel.add(new JLabel());
-        JButton button = new JButton("Create Game");
-        button.setFont(new Font("Arial", Font.BOLD, 25));
-        button.setForeground(Color.WHITE);
-        button.setBackground(new Color(51, 153, 255));
-        button.setBorder(BorderFactory.createRaisedBevelBorder());
-        button.setFocusPainted(false);
-        panel.add(button);
+        buttonStartGame = new JButton("Create Game");
+        buttonStartGame.setFont(new Font("Arial", Font.BOLD, 25));
+        buttonStartGame.setForeground(Color.WHITE);
+        buttonStartGame.setBackground(new Color(51, 153, 255));
+        buttonStartGame.setBorder(BorderFactory.createRaisedBevelBorder());
+        buttonStartGame.setFocusPainted(false);
+        panel.add(buttonStartGame);
         panel.add(new JLabel());
         return panel;
     }
@@ -204,6 +209,28 @@ public class GameConfig extends JFrame {
                 }
             }
         });
+
+        player1ColorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Color color = JColorChooser.showDialog(null, "Choose a color", player1Color);
+                if (color != null) {
+                    player1Color = color;
+                    player1ColorButton.setBackground(player1Color);
+                }
+            }
+        });
+
+        player2ColorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Color color = JColorChooser.showDialog(null, "Choose a color", player2Color);
+                if (color != null) {
+                    player2Color = color;
+                    player2ColorButton.setBackground(player2Color);
+                }
+            }
+        });
     }
 
     /**
@@ -236,6 +263,28 @@ public class GameConfig extends JFrame {
                     limitCronometrado.setEnabled(true);
                 }
             }
+
+        });
+    }
+
+    private void prepareActionsStarConfigGameSize(GameConfig parent){
+        buttonStartGame.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try{
+                    int size = Integer.parseInt(gameSizeField.getText());
+                    if(size < 9){
+                        JOptionPane.showMessageDialog(null, "The size must be greater than 9", "Error", JOptionPane.ERROR_MESSAGE);
+                    }else{
+                        quoridor = new Quoridor("Normal", size);
+                        parent.dispose();
+                        quoripoobGUI.prepareElemtsGame();
+                    }
+                } catch (NumberFormatException ex){
+                    JOptionPane.showMessageDialog(null, "The size must be a number", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+
+            }
         });
     }
 
@@ -247,11 +296,16 @@ public class GameConfig extends JFrame {
         prepareActionsStarConfigPlayer();
     }
 
+
+
     /**
      * Constructor
      */
-    public GameConfig(){
+    public GameConfig(QuoripoobGUI quoripoobGUI) {
         preparateElement();
+        this.quoripoobGUI = quoripoobGUI;
+        this.setVisible(true);
+        prepareActionsStarConfigGameSize(this);
     }
 
 }

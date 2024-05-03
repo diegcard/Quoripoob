@@ -1,5 +1,8 @@
 package Quoripoob.src.presentation;
 
+import Quoripoob.src.domain.Quoridor;
+import Quoripoob.src.domain.QuoridorExecptions;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -12,6 +15,8 @@ public class QuoripoobGUI extends JFrame{
     private static final int WIDTH = (int) (3 * screenSize.getWidth() / 4);
     private static final int HEIGHT = (int) (3 * screenSize.getHeight() / 4);
 
+    private Quoridor quoridor;
+
     // Panel Menu
     private JMenuItem itemNewGame;
     private JMenuItem itemLoadGame;
@@ -23,6 +28,8 @@ public class QuoripoobGUI extends JFrame{
 
     //buttons game
     private JButton buttonPlay;
+    private JPanel player1;
+    private JPanel player2;
 
     /**
      * Method to prepare the menu
@@ -112,6 +119,8 @@ public class QuoripoobGUI extends JFrame{
         buttonPlay.setBackground(new Color(51, 153, 255));
         buttonPlay.setBorder(BorderFactory.createRaisedBevelBorder());
         buttonPlay.setFocusPainted(false);
+        QuoripoobGUI parent = this;
+
         buttonPlay.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -123,12 +132,17 @@ public class QuoripoobGUI extends JFrame{
             }
 
             public void mouseClicked(MouseEvent e) {
+
                 //panelStart.setVisible(false);
                 //prepareGamePanel();3
-                GameConfig gameConfig = new GameConfig();
-                gameConfig.setVisible(true);
+                try {
+                    GameConfig gameConfig = new GameConfig(parent);
+                } catch (QuoridorExecptions ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
+
         panelStart.add(buttonPlay);
         // Agregar etiquetas vacías en la última fila
         for (int i = 0; i < 4; i++) {
@@ -194,7 +208,6 @@ public class QuoripoobGUI extends JFrame{
         }
     }
 
-
     private void prepareGamePanel() {
         panelGame = new JPanel();
         panelGame.setLayout(new GridLayout(8, 8));
@@ -244,4 +257,169 @@ public class QuoripoobGUI extends JFrame{
         gui.setVisible(true);
     }
 
+    private void refersh(){
+        revalidate();
+        repaint();
+    }
+
+    public void prepareElemtsGame() {
+        this.quoridor = Quoridor.getQuoridor();
+        getContentPane().removeAll();
+        refersh();
+
+        // Crear un panel principal con un BorderLayout
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        // Panel para el jugador 1
+        player1 = new JPanel();
+        player1.setBackground(Color.LIGHT_GRAY);
+        player1.setBorder(BorderFactory.createTitledBorder("Player 1"));
+        // Agrega los componentes necesarios para mostrar la información del jugador 1
+        mainPanel.add(player1, BorderLayout.WEST);
+
+        // Panel para la matriz del juego y el indicador de tiempo
+        JPanel gamePanel = new JPanel(new BorderLayout());
+
+        // Crear el indicador de tiempo
+        JLabel timeLabel = new JLabel("Time: 00:00");
+        timeLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        timeLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        gamePanel.add(timeLabel, BorderLayout.NORTH);
+
+
+
+        // Crear la matriz del juego
+        JPanel boardPanel = new JPanel(new GridLayout(9, 9)); // 9x9 para incluir los bordes
+
+        for (int row = 0; row < 9; row++) {
+            for (int col = 0; col < 9; col++) {
+                JPanel cell = new JPanel(new BorderLayout());
+                cell.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
+                if (row == 0 || row == 8 || col == 0 || col == 8) {
+                    // Celdas de borde
+                    cell.setBackground(Color.LIGHT_GRAY);
+                } else if ((row + col) % 2 == 0) {
+                    // Celdas para movimiento de jugadores
+                    JButton moveButton = new JButton();
+                    moveButton.setBackground(Color.WHITE);
+                    cell.add(moveButton, BorderLayout.CENTER);
+                } else {
+                    // Celdas para colocación de muros
+                    JButton wallButton = new JButton();
+                    wallButton.setBackground(Color.GRAY);
+                    wallButton.setPreferredSize(new Dimension(20, 20));
+                    cell.add(wallButton, BorderLayout.CENTER);
+                }
+
+                boardPanel.add(cell);
+            }
+        }
+
+        gamePanel.add(boardPanel, BorderLayout.CENTER);
+
+        mainPanel.add(gamePanel, BorderLayout.CENTER);
+
+
+
+
+
+        // Panel para el jugador 2
+        player2 = new JPanel();
+        player2.setBackground(Color.LIGHT_GRAY);
+        player2.setBorder(BorderFactory.createTitledBorder("Player 2"));
+        // Agrega los componentes necesarios para mostrar la información del jugador 2
+        mainPanel.add(player2, BorderLayout.EAST);
+
+        prepareElemtsPlayers();
+
+        // Agrega el panel principal al ContentPane
+        add(mainPanel, BorderLayout.CENTER);
+        refersh();
+    }
+
+    /**
+     * Método para preparar los elementos del jugador 1
+     */
+    private void prepareElementsPlayer1() {
+        player1.removeAll();
+        refersh();
+
+        // Agregar los componentes necesarios para mostrar la información del jugador 1
+        JLabel labelPlayer1 = new JLabel("Player 1");
+        player1.add(labelPlayer1);
+
+        // Crear un panel para el JComboBox y la etiqueta
+        JPanel bridgePanel = new JPanel();
+        bridgePanel.setLayout(new BoxLayout(bridgePanel, BoxLayout.Y_AXIS));
+
+        // Crear una etiqueta para el JComboBox
+        JLabel bridgeLabel = new JLabel("Tipo de barrera:");
+        bridgeLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        bridgeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Crear el JComboBox con las opciones de puentes/barreras
+        String[] options = {"Normal", "Temporal", "Larga", "Barreras aliadas"};
+        JComboBox<String> bridgeComboBox = new JComboBox<>(options);
+
+        // Personalizar el estilo del JComboBox
+        bridgeComboBox.setFont(new Font("Arial", Font.PLAIN, 14));
+        bridgeComboBox.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        bridgeComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Agregar la etiqueta y el JComboBox al panel
+        bridgePanel.add(bridgeLabel);
+        bridgePanel.add(Box.createVerticalStrut(5)); // Espacio entre la etiqueta y el JComboBox
+        bridgePanel.add(bridgeComboBox);
+
+        player1.add(bridgePanel);
+
+        refersh();
+    }
+
+    /**
+     * Método para preparar los elementos de los jugadores
+     */
+    private void prepareElementsPlayer2(){
+        player2.removeAll();
+        refersh();
+
+        // Agregar los componentes necesarios para mostrar la información del jugador 2
+        JLabel labelPlayer2 = new JLabel("Player 2");
+        player2.add(labelPlayer2);
+
+        // Crear un panel para el JComboBox y la etiqueta
+        JPanel bridgePanel = new JPanel();
+        bridgePanel.setLayout(new BoxLayout(bridgePanel, BoxLayout.Y_AXIS));
+
+        // Crear una etiqueta para el JComboBox
+        JLabel bridgeLabel = new JLabel("Tipo de barrera:");
+        bridgeLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        bridgeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Crear el JComboBox con las opciones de puentes/barreras
+        String[] options = {"Normal", "Temporal", "Larga", "Barreras aliadas"};
+        JComboBox<String> bridgeComboBox = new JComboBox<>(options);
+
+        // Personalizar el estilo del JComboBox
+        bridgeComboBox.setFont(new Font("Arial", Font.PLAIN, 14));
+        bridgeComboBox.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        bridgeComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Agregar la etiqueta y el JComboBox al panel
+        bridgePanel.add(bridgeLabel);
+        bridgePanel.add(Box.createVerticalStrut(5)); // Espacio entre la etiqueta y el JComboBox
+        bridgePanel.add(bridgeComboBox);
+
+        player2.add(bridgePanel);
+
+        refersh();
+
+
+    }
+
+    private void prepareElemtsPlayers(){
+        prepareElementsPlayer1();
+        prepareElementsPlayer2();
+    }
 }
