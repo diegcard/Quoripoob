@@ -1,7 +1,7 @@
 package Quoripoob.src.presentation;
 
 import Quoripoob.src.domain.Quoridor;
-import Quoripoob.src.domain.QuoridorExecptions;
+import Quoripoob.src.domain.QuoridorException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -130,14 +130,10 @@ public class QuoripoobGUI extends JFrame{
             public void mouseExited(MouseEvent e) {
                 buttonPlay.setBackground(new Color(51, 153, 255));
             }
-
             public void mouseClicked(MouseEvent e) {
-
-                //panelStart.setVisible(false);
-                //prepareGamePanel();3
                 try {
                     GameConfig gameConfig = new GameConfig(parent);
-                } catch (QuoridorExecptions ex) {
+                } catch (QuoridorException ex) {
                     throw new RuntimeException(ex);
                 }
             }
@@ -164,6 +160,11 @@ public class QuoripoobGUI extends JFrame{
             @Override
             public void mouseExited(MouseEvent e) {
                 buttonCredits.setBackground(new Color(51, 153, 255));
+            }
+
+            public void mouseClicked(MouseEvent e) {
+                CreditsGUI credits = new CreditsGUI();
+                credits.setVisible(true);
             }
         });
         panelStart.add(buttonCredits);
@@ -208,6 +209,7 @@ public class QuoripoobGUI extends JFrame{
         }
     }
 
+    /*
     private void prepareGamePanel() {
         panelGame = new JPanel();
         panelGame.setLayout(new GridLayout(8, 8));
@@ -243,7 +245,7 @@ public class QuoripoobGUI extends JFrame{
         panelGame.add(buttonBack);
 
         add(panelGame, BorderLayout.CENTER);
-    }
+    }*/
 
 
 
@@ -286,43 +288,80 @@ public class QuoripoobGUI extends JFrame{
         timeLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         gamePanel.add(timeLabel, BorderLayout.NORTH);
 
-
-
         // Crear la matriz del juego
-        JPanel boardPanel = new JPanel(new GridLayout(9, 9)); // 9x9 para incluir los bordes
+        JPanel boardPanel = new JPanel(null); // Usar un layout nulo para posicionar los botones manualmente
 
-        for (int row = 0; row < 9; row++) {
-            for (int col = 0; col < 9; col++) {
-                JPanel cell = new JPanel(new BorderLayout());
-                cell.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        JButton[][] boardButtons = new JButton[17][17];
 
-                if (row == 0 || row == 8 || col == 0 || col == 8) {
-                    // Celdas de borde
-                    cell.setBackground(Color.LIGHT_GRAY);
-                } else if ((row + col) % 2 == 0) {
-                    // Celdas para movimiento de jugadores
-                    JButton moveButton = new JButton();
-                    moveButton.setBackground(Color.WHITE);
-                    cell.add(moveButton, BorderLayout.CENTER);
-                } else {
-                    // Celdas para colocación de muros
-                    JButton wallButton = new JButton();
-                    wallButton.setBackground(Color.GRAY);
-                    wallButton.setPreferredSize(new Dimension(20, 20));
-                    cell.add(wallButton, BorderLayout.CENTER);
+        // Agregar las fichas de los jugadores
+        JPanel player1Piece = new JPanel();
+        player1Piece.setBackground(Color.RED); // Cambiar el color según sea necesario
+        player1Piece.setPreferredSize(new Dimension(30, 30));
+        player1Piece.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+
+        JPanel player2Piece = new JPanel();
+        player2Piece.setBackground(Color.BLUE); // Cambiar el color según sea necesario
+        player2Piece.setPreferredSize(new Dimension(30, 30));
+        player2Piece.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+
+        for (int i = 0; i < 17; i++) {
+            for (int j = 0; j < 17; j++) {
+                boardButtons[i][j] = new JButton();
+
+                int x = 0;
+                int y = 0;
+                int width = 0;
+                int height = 0;
+
+                // Boton grande posicion 0,0
+                if (i % 2 == 0 && j % 2 == 0) {
+                    x = i / 2 * 70;
+                    y = j / 2 * 70;
+                    width = 60;
+                    height = 60;
+                    boardButtons[i][j].setBackground(new Color(61, 76, 149));
+                    boardButtons[i][j].setBorder(BorderFactory.createEmptyBorder());
+
+                    // Agregar las fichas de los jugadores en las posiciones iniciales
+                    if (i == 0 && j == 0) {
+                        //player1Piece.setBounds(x + 10, y + 10, 40, 40);
+                        boardPanel.add(player1Piece);
+                    } else if (i == 16 && j == 16) {
+                        //player2Piece.setBounds(x + 10, y + 10, 40, 40);
+                        boardPanel.add(player2Piece);
+                    }
+                } else if (i % 2 == 0 && j % 2 != 0) {
+                    x = i / 2 * 70;
+                    y = (j - 1) / 2 * 70 + 60;
+                    width = 60;
+                    height = 10;
+                    boardButtons[i][j].setBackground(new Color(234, 12, 12));
+                    boardButtons[i][j].setBorder(BorderFactory.createEmptyBorder());
+                } else if (i % 2 != 0 && j % 2 == 0) { // Botón delgado en la posición 1,0
+                    x = (i - 1) / 2 * 70 + 60;
+                    y = j / 2 * 70;
+                    width = 10;
+                    height = 60;
+                    boardButtons[i][j].setBackground(new Color(234, 12, 12));
+                    boardButtons[i][j].setBorder(BorderFactory.createEmptyBorder());
+                } else if (i % 2 != 0 && j % 2 != 0) { // Botón cuadrado sin bordes en la posición 1,1
+                    x = (i - 1) / 2 * 70 + 60;
+                    y = (j - 1) / 2 * 70 + 60;
+                    width = 10;
+                    height = 10;
+                    boardButtons[i][j].setBackground(new Color(234, 12, 12));
+                    boardButtons[i][j].setBorder(BorderFactory.createEmptyBorder());
                 }
 
-                boardPanel.add(cell);
+                boardButtons[i][j].setBounds(x, y, width, height);
+                boardPanel.add(boardButtons[i][j]);
             }
         }
+        boardButtons[8][0].add(player1Piece);
+        boardButtons[8][16].add(player2Piece);
 
         gamePanel.add(boardPanel, BorderLayout.CENTER);
-
         mainPanel.add(gamePanel, BorderLayout.CENTER);
-
-
-
-
 
         // Panel para el jugador 2
         player2 = new JPanel();
@@ -337,6 +376,7 @@ public class QuoripoobGUI extends JFrame{
         add(mainPanel, BorderLayout.CENTER);
         refersh();
     }
+
 
     /**
      * Método para preparar los elementos del jugador 1
@@ -380,7 +420,7 @@ public class QuoripoobGUI extends JFrame{
     /**
      * Método para preparar los elementos de los jugadores
      */
-    private void prepareElementsPlayer2(){
+    private void prepareElementsPlayer2() {
         player2.removeAll();
         refersh();
 
@@ -411,10 +451,45 @@ public class QuoripoobGUI extends JFrame{
         bridgePanel.add(Box.createVerticalStrut(5)); // Espacio entre la etiqueta y el JComboBox
         bridgePanel.add(bridgeComboBox);
 
+
+
+        //Mostrar barreras
+
+
+        JLabel labelBridges = new JLabel("Barreras:");
+        labelBridges.setFont(new Font("Arial", Font.BOLD, 14));
+        labelBridges.setAlignmentX(Component.LEFT_ALIGNMENT);
+        bridgePanel.add(labelBridges);
+
+        // Crear un panel para las barreras
+        JPanel bridgesPanel = new JPanel();
+        bridgesPanel.setLayout(new BoxLayout(bridgesPanel, BoxLayout.Y_AXIS));
+
+        // Crear las etiquetas para las barreras
+        JLabel normalLabel = new JLabel("Normales: 10");
+        normalLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        normalLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel temporalLabel = new JLabel("Temporales: 10");
+        temporalLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        temporalLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel longLabel = new JLabel("Largas: 5");
+        longLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        longLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel allyLabel = new JLabel("Aliadas: 5");
+        allyLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        allyLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Agregar las etiquetas al panel
+        bridgesPanel.add(normalLabel);
+        bridgesPanel.add(temporalLabel);
+        bridgesPanel.add(longLabel);
+        bridgesPanel.add(allyLabel);
+
+        // Agregar el panel de las barreras al panel principal
+        bridgePanel.add(bridgesPanel);
+
         player2.add(bridgePanel);
-
         refersh();
-
 
     }
 

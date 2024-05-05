@@ -1,15 +1,31 @@
 package Quoripoob.src.presentation;
 
 import Quoripoob.src.domain.Quoridor;
+import Quoripoob.src.domain.QuoridorException;
 
-import javax.swing.*;
 import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.BorderFactory;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
 
 public class GameConfig extends JFrame {
     // Constants Screen
@@ -273,8 +289,8 @@ public class GameConfig extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 try{
                     int size = Integer.parseInt(gameSizeField.getText());
-                    if(size < 9){
-                        JOptionPane.showMessageDialog(null, "The size must be greater than 9", "Error", JOptionPane.ERROR_MESSAGE);
+                    if(size < 9 && size % 2 != 0){
+                        JOptionPane.showMessageDialog(null, "The size must be greater than 9 and is different from odd", "Error", JOptionPane.ERROR_MESSAGE);
                     }else{
                         quoridor = new Quoridor("Normal", size);
                         parent.dispose();
@@ -289,19 +305,17 @@ public class GameConfig extends JFrame {
     }
 
     /**
-     * Method to prepare the actions
+     * Method to prepare the actions of the screen
      */
     private void prepareActionsGae(){
         prepareActionsStarConfigGameMode();
         prepareActionsStarConfigPlayer();
     }
 
-
-
     /**
      * Constructor
      */
-    public GameConfig(QuoripoobGUI quoripoobGUI) {
+    public GameConfig(QuoripoobGUI quoripoobGUI) throws QuoridorException {
         preparateElement();
         this.quoripoobGUI = quoripoobGUI;
         this.setVisible(true);
