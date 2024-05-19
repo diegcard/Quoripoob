@@ -1,6 +1,6 @@
 package Quoripoob.src.presentation;
 
-import Quoripoob.src.domain.Quoridor;
+import Quoripoob.src.domain.*;
 import Quoripoob.src.domain.QuoridorException;
 
 import javax.swing.border.CompoundBorder;
@@ -26,6 +26,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class GameConfig extends JFrame {
     // Constants Screen
@@ -59,9 +62,15 @@ public class GameConfig extends JFrame {
      * Method to prepare the elements of the screen
      */
     private void preparateElement() {
-        try {
+        /*try {
             UIManager.setLookAndFeel(new NimbusLookAndFeel());
         } catch (UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }*/
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (InstantiationException | IllegalAccessException
+                 | UnsupportedLookAndFeelException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         setTitle("Quoripoob ANGIE CUTE");
@@ -293,6 +302,7 @@ public class GameConfig extends JFrame {
                         JOptionPane.showMessageDialog(null, "The size must be greater than 9 and is different from odd", "Error", JOptionPane.ERROR_MESSAGE);
                     }else{
                         quoridor = new Quoridor("Normal", size);
+                        prapareInfomationsPlayers();
                         parent.dispose();
                         quoripoobGUI.prepareElemtsGame();
                     }
@@ -321,5 +331,29 @@ public class GameConfig extends JFrame {
         this.setVisible(true);
         prepareActionsStarConfigGameSize(this);
     }
+
+    private void prapareInfomationsPlayers(){
+        if (gamePlayers.getSelectedItem().equals("Player vs Player")) {
+            //Config player one
+            Player playerOne = new NormalPlayer();
+            playerOne.setName(player1Name.getText());
+            playerOne.setColor(player1Color);
+            quoridor.setPlayerOne(playerOne);
+            //Config player two
+            Player playerTwo = new NormalPlayer();
+            playerTwo.setName(player2Name.getText());
+            playerTwo.setColor(player2Color);
+            quoridor.setPlayerTwo(playerTwo);
+        } else if (gamePlayers.getSelectedItem().equals("Player vs Machine")) {
+            return;
+        } else if (gamePlayers.getSelectedItem().equals("Machine vs Machine")) {
+            return;
+        }
+    }
+
+    public Quoridor getQuoridor(){
+        return quoridor;
+    }
+
 
 }
