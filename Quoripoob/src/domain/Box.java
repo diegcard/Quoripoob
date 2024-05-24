@@ -9,7 +9,18 @@ package Quoripoob.src.domain;
  */
 public abstract class Box {
 
+    private boolean isOcupate;
     public Box() {
 
     }
+
+    public void setOcupate(boolean isOcupate){
+        this.isOcupate = isOcupate;
+    }
+
+    public boolean getOcupate(){
+        return isOcupate;
+    }
+
+
 }

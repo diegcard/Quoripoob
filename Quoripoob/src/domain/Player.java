@@ -1,22 +1,23 @@
 package Quoripoob.src.domain;
 
-import java.awt.Color;
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public abstract class Player {
     private String name;
     protected Color color;
     protected HashMap<String, Integer> walls;
-    protected Game game;
     protected int row;
     protected int col;
+    protected Quoridor quoridor;
 
     public Player(){
-        walls = new HashMap<>();
     }
 
-    public void setGame(Game game){
-        this.game = game;
+    public void setQuoridor(Quoridor quoridor){
+        this.quoridor = quoridor;
     }
 
     public void setName(String name){
@@ -49,6 +50,28 @@ public abstract class Player {
 
     public int getCol(){
         return col;
+    }
+
+    public void setWalls(HashMap<String, Integer> walls){
+        this.walls = walls;
+    }
+
+    public HashMap<String, Integer> getWalls(){
+        return walls;
+    }
+
+    public void move(){
+
+    }
+
+    public int[] getPossibleMoves() {
+        int[] moves = new int[4];
+        if (quoridor != null && quoridor.getBoard() != null) {
+            Board board = quoridor.getBoard();
+            int xPos = getCol();
+            int yPos = getRow();
+        }
+        return moves;
     }
 
 

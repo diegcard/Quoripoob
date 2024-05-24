@@ -28,6 +28,7 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class GameConfig extends JFrame {
@@ -37,7 +38,8 @@ public class GameConfig extends JFrame {
     private static final int HEIGHT = (int) (3 * screenSize.getHeight() / 5);
 
     private QuoripoobGUI quoripoobGUI;
-    private Quoridor quoridor;
+
+    //private Quoridor quoridor;
 
     private JTextField gameSizeField;
 
@@ -192,7 +194,7 @@ public class GameConfig extends JFrame {
         panel.add(new JLabel());
         buttonStartGame = new JButton("Create Game");
         buttonStartGame.setFont(new Font("Arial", Font.BOLD, 25));
-        buttonStartGame.setForeground(Color.WHITE);
+        buttonStartGame.setForeground(Color.BLACK);
         buttonStartGame.setBackground(new Color(51, 153, 255));
         buttonStartGame.setBorder(BorderFactory.createRaisedBevelBorder());
         buttonStartGame.setFocusPainted(false);
@@ -301,7 +303,8 @@ public class GameConfig extends JFrame {
                     if(size < 9 && size % 2 != 0){
                         JOptionPane.showMessageDialog(null, "The size must be greater than 9 and is different from odd", "Error", JOptionPane.ERROR_MESSAGE);
                     }else{
-                        quoridor = new Quoridor("Normal", size);
+                        quoripoobGUI.setQuoridor(new Quoridor());
+                        quoripoobGUI.getQuoridor().setSize(Integer.parseInt(gameSizeField.getText()));
                         prapareInfomationsPlayers();
                         parent.dispose();
                         quoripoobGUI.prepareElemtsGame();
@@ -333,27 +336,36 @@ public class GameConfig extends JFrame {
     }
 
     private void prapareInfomationsPlayers(){
+        HashMap<String, Integer> walls = new HashMap<>();
+        walls.put("Normal", 7);
+        walls.put("Temporales", 3);
+        walls.put("Largas", 3);
+        walls.put("Aliadas", 3);
+
         if (gamePlayers.getSelectedItem().equals("Player vs Player")) {
             //Config player one
             Player playerOne = new NormalPlayer();
             playerOne.setName(player1Name.getText());
             playerOne.setColor(player1Color);
-            quoridor.setPlayerOne(playerOne);
+            playerOne.setWalls(walls);
+            quoripoobGUI.getQuoridor().setPlayerOne(playerOne);
+
+
             //Config player two
             Player playerTwo = new NormalPlayer();
             playerTwo.setName(player2Name.getText());
             playerTwo.setColor(player2Color);
-            quoridor.setPlayerTwo(playerTwo);
+            playerTwo.setWalls(walls);
+            quoripoobGUI.getQuoridor().setPlayerTwo(playerTwo);
+
+            quoripoobGUI.getQuoridor().setGameMode(gameMode.getSelectedItem().toString());
+
+            quoripoobGUI.getQuoridor().setSize(Integer.parseInt(gameSizeField.getText()));
+
         } else if (gamePlayers.getSelectedItem().equals("Player vs Machine")) {
             return;
         } else if (gamePlayers.getSelectedItem().equals("Machine vs Machine")) {
             return;
         }
     }
-
-    public Quoridor getQuoridor(){
-        return quoridor;
-    }
-
-
 }

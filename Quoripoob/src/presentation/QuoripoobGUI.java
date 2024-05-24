@@ -1,5 +1,7 @@
 package Quoripoob.src.presentation;
 
+import Quoripoob.src.domain.Board;
+import Quoripoob.src.domain.NormalBox;
 import Quoripoob.src.domain.Quoridor;
 import Quoripoob.src.domain.QuoridorException;
 
@@ -9,11 +11,11 @@ import java.awt.event.*;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import java.util.PriorityQueue;
 
-public class QuoripoobGUI extends JFrame{
+public class QuoripoobGUI extends JFrame {
     // Constants Screen
     private static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    private static final int WIDTH = (int) (3 * screenSize.getWidth() / 4);
-    private static final int HEIGHT = (int) (3 * screenSize.getHeight() / 4);
+    private static final int WIDTH = (int) (3 * screenSize.getWidth() / 3.5);
+    private static final int HEIGHT = (int) (3 * screenSize.getHeight() / 3.5);
 
     private Quoridor quoridor;
 
@@ -23,9 +25,6 @@ public class QuoripoobGUI extends JFrame{
     private JMenuItem itemSaveGame;
     private JMenuItem itemExit;
 
-    // Panel Game
-    private JPanel panelGame;
-
     //buttons game
     private JButton buttonPlay;
     private JPanel player1;
@@ -33,9 +32,10 @@ public class QuoripoobGUI extends JFrame{
 
     /**
      * Method to prepare the menu
+     *
      * @return JMenuBar
      */
-    private JMenuBar preparateElementsMenu(){
+    private JMenuBar preparateElementsMenu() {
         JMenuBar menuBar = new JMenuBar();
         JMenu menuGame = new JMenu("File");
         itemNewGame = new JMenuItem("New Game");
@@ -49,6 +49,14 @@ public class QuoripoobGUI extends JFrame{
         menuGame.add(itemExit);
         menuBar.add(menuGame);
         return menuBar;
+    }
+
+    public void setQuoridor(Quoridor quoridor) {
+        this.quoridor = quoridor;
+    }
+
+    public Quoridor getQuoridor() {
+        return quoridor;
     }
 
     /**
@@ -127,10 +135,12 @@ public class QuoripoobGUI extends JFrame{
             public void mouseEntered(MouseEvent e) {
                 buttonPlay.setBackground(new Color(35, 35, 35));
             }
+
             @Override
             public void mouseExited(MouseEvent e) {
                 buttonPlay.setBackground(new Color(51, 153, 255));
             }
+
             public void mouseClicked(MouseEvent e) {
                 try {
                     GameConfig gameConfig = new GameConfig(parent);
@@ -148,7 +158,7 @@ public class QuoripoobGUI extends JFrame{
         //Boton Creditos
         JButton buttonCredits = new JButton("Credits");
         buttonCredits.setFont(new Font("Arial", Font.BOLD, 25));
-        buttonCredits.setForeground(Color.WHITE);
+        buttonCredits.setForeground(Color.BLACK);
         buttonCredits.setBackground(new Color(51, 153, 255));
         buttonCredits.setBorder(BorderFactory.createRaisedBevelBorder());
         buttonCredits.setFocusPainted(false);
@@ -201,7 +211,7 @@ public class QuoripoobGUI extends JFrame{
     /**
      * Method to close the application
      */
-    private void closeOption(){
+    private void closeOption() {
         int yesNo = JOptionPane.showOptionDialog(null, "Are you sure you want exit?", "Warning",
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, "No");
         if (yesNo == JOptionPane.YES_OPTION) {
@@ -212,21 +222,22 @@ public class QuoripoobGUI extends JFrame{
 
     /**
      * Main method
+     *
      * @param args Arguments
-
      */
     public static void main(String[] args) {
         QuoripoobGUI gui = new QuoripoobGUI();
         gui.setVisible(true);
     }
 
-    private void refersh(){
+    private void refersh() {
         revalidate();
         repaint();
     }
+    private JButton[][] boardButtons = new JButton[17][17];
 
     public void prepareElemtsGame() {
-        quoridor = Quoridor.getQuoridor();
+        //quoridor = Quoridor.getQuoridor();
         getContentPane().removeAll();
         refersh();
 
@@ -247,23 +258,30 @@ public class QuoripoobGUI extends JFrame{
         JLabel timeLabel = new JLabel("Time: 00:00");
         timeLabel.setFont(new Font("Arial", Font.BOLD, 16));
         timeLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel turn = quoridor.getTurn() ? new JLabel("Turno: " + quoridor.getPlayerOne().getName()) : new JLabel("Turno: " + quoridor.getPlayerTwo().getName());
+        turn.setFont(new Font("Arial", Font.BOLD, 16));
+        turn.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+
         gamePanel.add(timeLabel, BorderLayout.NORTH);
+        gamePanel.add(turn, BorderLayout.SOUTH);
 
         // Crear la matriz del juego
         JPanel boardPanel = new JPanel(null); // Usar un layout nulo para posicionar los botones manualmente
 
-        JButton[][] boardButtons = new JButton[17][17];
-
         // Agregar las fichas de los jugadores
         JPanel player1Piece = new JPanel();
-        player1Piece.setBackground(Color.RED); // Cambiar el color según sea necesario
+        player1Piece.setBackground(quoridor.getPlayerOne().getColor());
         player1Piece.setPreferredSize(new Dimension(30, 30));
         player1Piece.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
         JPanel player2Piece = new JPanel();
-        player2Piece.setBackground(Color.BLUE); // Cambiar el color según sea necesario
+        player2Piece.setBackground(quoridor.getPlayerTwo().getColor());
         player2Piece.setPreferredSize(new Dimension(30, 30));
         player2Piece.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+
+        Board board = quoridor.getBoard();
 
         for (int i = 0; i < 17; i++) {
             for (int j = 0; j < 17; j++) {
@@ -315,11 +333,25 @@ public class QuoripoobGUI extends JFrame{
                 }
 
                 boardButtons[i][j].setBounds(x, y, width, height);
+                board.setBox(i, j, new NormalBox());
                 boardPanel.add(boardButtons[i][j]);
             }
         }
+
+        player1Piece.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                System.out.println("Player 1 and pos x: " + quoridor.getPlayerOne().getRow() + " y: " + quoridor.getPlayerOne().getCol());
+                posibleMovents();
+
+            }
+        });
         boardButtons[8][0].add(player1Piece);
+        quoridor.getPlayerOne().setRow(8);
+        quoridor.getPlayerOne().setCol(0);
         boardButtons[8][16].add(player2Piece);
+        quoridor.getPlayerTwo().setRow(8);
+        quoridor.getPlayerTwo().setCol(16);
 
         gamePanel.add(boardPanel, BorderLayout.CENTER);
         mainPanel.add(gamePanel, BorderLayout.CENTER);
@@ -333,13 +365,40 @@ public class QuoripoobGUI extends JFrame{
 
         prepareElemtsPlayers();
 
+        System.out.println(quoridor.getPlayerOne().getName());
+
         // Agrega el panel principal al ContentPane
         add(mainPanel, BorderLayout.CENTER);
         refersh();
     }
 
+    private void posibleMovents(){
+        JPanel player1Piece = new JPanel();
+        player1Piece.setBackground(quoridor.getPlayerOne().getColor());
+        player1Piece.setPreferredSize(new Dimension(30, 30));
+        player1Piece.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
-    /**|
+        Board board = quoridor.getBoard();
+
+        int row;
+        int col;
+        if(quoridor.getCurrentPlayer()==quoridor.getPlayerOne()){
+            row = quoridor.getPlayerOne().getRow();
+            col = quoridor.getPlayerOne().getCol();
+        }else{
+            row = quoridor.getPlayerTwo().getRow();
+            col = quoridor.getPlayerTwo().getCol();
+        }
+        boardButtons[8][0].setBackground(Color.WHITE);
+        System.out.println("Si pasa");
+        //boardButtons[row+2][col+2].add(player1Piece);
+        refersh();
+
+    }
+
+
+    /**
+     * |
      * Método para preparar los elementos del jugador 1
      */
     private void prepareElementsPlayer1() {
@@ -347,7 +406,7 @@ public class QuoripoobGUI extends JFrame{
         refersh();
 
         // Agregar los componentes necesarios para mostrar la información del jugador 1
-        JLabel labelPlayer1 = new JLabel("Player 1");
+        JLabel labelPlayer1 = new JLabel(quoridor.getPlayerOne().getName());
         player1.add(labelPlayer1);
 
         // Crear un panel para el JComboBox y la etiqueta
@@ -373,6 +432,41 @@ public class QuoripoobGUI extends JFrame{
         bridgePanel.add(Box.createVerticalStrut(5)); // Espacio entre la etiqueta y el JComboBox
         bridgePanel.add(bridgeComboBox);
 
+        //Mostrar barreras
+
+        JLabel labelBridges = new JLabel("Barreras:");
+        labelBridges.setFont(new Font("Arial", Font.BOLD, 14));
+        labelBridges.setAlignmentX(Component.LEFT_ALIGNMENT);
+        bridgePanel.add(labelBridges);
+
+        // Crear un panel para las barreras
+        JPanel bridgesPanel = new JPanel();
+        bridgesPanel.setLayout(new BoxLayout(bridgesPanel, BoxLayout.Y_AXIS));
+
+        // Crear las etiquetas para las barreras
+        JLabel normalLabel = new JLabel("Normales: " + quoridor.getPlayerOne().getWalls().get("Normal"));
+        normalLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        normalLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel temporalLabel = new JLabel("Temporales: " + quoridor.getPlayerOne().getWalls().get("Temporales"));
+        temporalLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        temporalLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel longLabel = new JLabel("Largas: " + quoridor.getPlayerOne().getWalls().get("Largas"));
+        longLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        longLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel allyLabel = new JLabel("Aliadas: " + quoridor.getPlayerOne().getWalls().get("Aliadas"));
+        allyLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        allyLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Agregar las etiquetas al panel
+        bridgesPanel.add(normalLabel);
+        bridgesPanel.add(temporalLabel);
+        bridgesPanel.add(longLabel);
+        bridgesPanel.add(allyLabel);
+
+        // Agregar el panel de las barreras al panel principal
+        bridgePanel.add(bridgesPanel);
+
+
         player1.add(bridgePanel);
 
         refersh();
@@ -386,7 +480,7 @@ public class QuoripoobGUI extends JFrame{
         refersh();
 
         // Agregar los componentes necesarios para mostrar la información del jugador 2
-        JLabel labelPlayer2 = new JLabel("Player 2");
+        JLabel labelPlayer2 = new JLabel(quoridor.getPlayerTwo().getName());
         player2.add(labelPlayer2);
 
         // Crear un panel para el JComboBox y la etiqueta
@@ -412,10 +506,7 @@ public class QuoripoobGUI extends JFrame{
         bridgePanel.add(Box.createVerticalStrut(5)); // Espacio entre la etiqueta y el JComboBox
         bridgePanel.add(bridgeComboBox);
 
-
-
         //Mostrar barreras
-
 
         JLabel labelBridges = new JLabel("Barreras:");
         labelBridges.setFont(new Font("Arial", Font.BOLD, 14));
@@ -427,16 +518,16 @@ public class QuoripoobGUI extends JFrame{
         bridgesPanel.setLayout(new BoxLayout(bridgesPanel, BoxLayout.Y_AXIS));
 
         // Crear las etiquetas para las barreras
-        JLabel normalLabel = new JLabel("Normales: 10");
+        JLabel normalLabel = new JLabel("Normales: " + quoridor.getPlayerTwo().getWalls().get("Normal"));
         normalLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         normalLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        JLabel temporalLabel = new JLabel("Temporales: 10");
+        JLabel temporalLabel = new JLabel("Temporales: " + quoridor.getPlayerTwo().getWalls().get("Temporales"));
         temporalLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         temporalLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        JLabel longLabel = new JLabel("Largas: 5");
+        JLabel longLabel = new JLabel("Largas: " + quoridor.getPlayerTwo().getWalls().get("Largas"));
         longLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         longLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        JLabel allyLabel = new JLabel("Aliadas: 5");
+        JLabel allyLabel = new JLabel("Aliadas: " + quoridor.getPlayerTwo().getWalls().get("Aliadas"));
         allyLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         allyLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -454,8 +545,12 @@ public class QuoripoobGUI extends JFrame{
 
     }
 
-    private void prepareElemtsPlayers(){
+    /**
+     * Método para preparar los elementos de los jugadores
+     */
+    private void prepareElemtsPlayers() {
         prepareElementsPlayer1();
         prepareElementsPlayer2();
     }
+
 }
