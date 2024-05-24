@@ -1,9 +1,7 @@
 package Quoripoob.src.domain;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public abstract class Player {
     private String name;

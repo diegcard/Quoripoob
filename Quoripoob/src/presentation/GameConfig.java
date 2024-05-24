@@ -1,7 +1,6 @@
 package Quoripoob.src.presentation;
 
 import Quoripoob.src.domain.*;
-import Quoripoob.src.domain.QuoridorException;
 
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.TitledBorder;
@@ -17,7 +16,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.BorderLayout;
@@ -26,10 +24,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 public class GameConfig extends JFrame {
     // Constants Screen

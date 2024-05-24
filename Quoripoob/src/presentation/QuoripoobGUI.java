@@ -8,8 +8,6 @@ import Quoripoob.src.domain.QuoridorException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
-import java.util.PriorityQueue;
 
 public class QuoripoobGUI extends JFrame {
     // Constants Screen
@@ -19,10 +17,6 @@ public class QuoripoobGUI extends JFrame {
 
     private Quoridor quoridor;
 
-    // Panel Menu
-    private JMenuItem itemNewGame;
-    private JMenuItem itemLoadGame;
-    private JMenuItem itemSaveGame;
     private JMenuItem itemExit;
 
     //buttons game
@@ -38,9 +32,10 @@ public class QuoripoobGUI extends JFrame {
     private JMenuBar preparateElementsMenu() {
         JMenuBar menuBar = new JMenuBar();
         JMenu menuGame = new JMenu("File");
-        itemNewGame = new JMenuItem("New Game");
-        itemLoadGame = new JMenuItem("Load Game");
-        itemSaveGame = new JMenuItem("Save Game");
+        // Panel Menu
+        JMenuItem itemNewGame = new JMenuItem("New Game");
+        JMenuItem itemLoadGame = new JMenuItem("Load Game");
+        JMenuItem itemSaveGame = new JMenuItem("Save Game");
         itemExit = new JMenuItem("Exit");
         menuGame.add(itemNewGame);
         menuGame.add(itemLoadGame);
